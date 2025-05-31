@@ -1,17 +1,65 @@
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { useState } from "react";
+import { PassTextArea } from "@/components/ui/passTextArea";
 
 export const PreparePaymentConfirmation = ({
   onConfirm,
 }: {
   onConfirm: (apiKey: string, txnId: string) => void;
 }) => {
+  const [apiKey, setApiKey] = useState("");
   const [txnId, setTxnId] = useState("");
+  if (apiKey && txnId) {
+    onConfirm(apiKey, txnId);
+  }
+  if (!apiKey) {
+    return <GetWiseApiKey onConfirm={setApiKey} />;
+  }
+  return <GetTransactionId onConfirm={setTxnId} />;
+};
+
+const GetTransactionId = ({
+  onConfirm,
+}: {
+  onConfirm: (txnId: string) => void;
+}) => {
+  const [txnId, setTxnId] = useState("");
+  return (
+    <>
+      <p className="text-center mb-12 max-w-md text-muted-foreground">
+        🧾 <strong>Enter your Wise Transaction ID</strong> to generate a payment confirmation.
+        <br /><br />
+        💡 You can find your transaction ID in the <em>Payments</em> section of your Wise dashboard.
+        Click into the specific transaction to copy the ID.
+      </p>
+
+      <PassTextArea
+        placeholder="Paste your Wise Transaction ID"
+        value={txnId}
+        onChange={(text) => setTxnId(text)}
+      />
+
+      <Button
+        variant="outline"
+        className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition"
+        onClick={() => onConfirm(txnId)}
+      >
+        Submit Transaction ID
+      </Button>
+    </>
+  );
+};
+
+const GetWiseApiKey = ({
+  onConfirm,
+}: {
+  onConfirm: (apiKey: string) => void;
+}) => {
   const [apiKey, setApiKey] = useState("")
   return (
     <>
-      <p className="text-center mb-12 max-w-md text-sm text-muted-foreground">
+      <p className="text-center mb-12 max-w-md text-muted-foreground">
         🔐 <strong>To confirm your payment</strong>, please provide your Wise API Key and the transaction ID you’d like to verify.
         <br /><br />
         🧭 You can find your API Key by following these steps:
@@ -26,25 +74,16 @@ export const PreparePaymentConfirmation = ({
         </span>
       </p>
 
-      <Textarea
+      <PassTextArea
         placeholder="Enter Your Wise API Key"
-        className="w-full max-w-md mb-4"
         value={apiKey}
-        onChange={(e) => setApiKey(e.target.value)}
-        readOnly
+        onChange={(text) => setApiKey(text)}
       />
 
-      <Textarea
-        className="w-full max-w-md mb-4"
-        placeholder="Enter ID of a Wise transaction you want to generate a payment confirmation for"
-        value={txnId}
-        onChange={(e) => setTxnId(e.target.value)}
-        rows={5}
-      />
       <Button
         variant="outline"
         className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition"
-        onClick={() => onConfirm(apiKey, txnId)}
+        onClick={() => onConfirm(apiKey)}
       >
         Confirm Payment
       </Button>

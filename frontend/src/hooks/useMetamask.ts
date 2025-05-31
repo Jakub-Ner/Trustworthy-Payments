@@ -19,6 +19,11 @@ export function useMetaMask() {
       window.ethereum.on("accountsChanged", (accounts: string[]) => {
         setAccount(accounts[0]);
       });
+      // clear account on unmount 
+      window.ethereum.on("disconnect", () => {
+        console.log("Disconnected from MetaMask");
+        setAccount(null);
+      });
     }
   }, []);
 
