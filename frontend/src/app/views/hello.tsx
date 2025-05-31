@@ -11,7 +11,7 @@ export default function Hello({
       <p className="text-center mb-12 max-w-md  text-muted-foreground">
         Tired of payment lag and uncertainty? 🐢
         <br />
-        In today's lightning-fast digital finance,
+        In today&lsquo;s lightning-fast digital finance,
         <br />
         <strong>you need proof, and you need it now</strong>. 
         <br /><br />

@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 // import { ethers } from "ethers";
 
+declare global {
+  interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ethereum: any;
+  }
+}
+
 export function useMetaMask() {
   const [account, setAccount] = useState<string | null>(null);
 
