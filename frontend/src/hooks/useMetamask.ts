@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ethers } from "ethers";
+// import { ethers } from "ethers";
 
 export function useMetaMask() {
   const [account, setAccount] = useState<string | null>(null);
