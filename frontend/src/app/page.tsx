@@ -15,7 +15,7 @@ export default function Home() {
   return (
     <NotificationProvider>
       <div className="w-full text-center mt-4 absolute">
-        <h1 className="text-2xl mt-4 font-bold">Trustworthy </h1>
+        <h1 className="text-2xl mt-4 font-bold">Trustworthy Transfers</h1>
       </div>
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
         {!account ? (
