@@ -16,10 +16,14 @@ const eslintConfig = [
     files: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
     languageOptions: {
       globals: {
-        window: "readonly",       
-        ethereum: "readonly",      
+        window: "readonly",
+        ethereum: "readonly",
       },
     },
+    rules: {
+      // @typescript-eslint/no-explicit-any
+      "@typescript-eslint/no-explicit-any": "off",
+    }
   },
 ];
 export default eslintConfig;

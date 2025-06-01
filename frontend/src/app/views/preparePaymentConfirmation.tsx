@@ -8,14 +8,10 @@ export const PreparePaymentConfirmation = ({
   onConfirm: (apiKey: string, txnId: string) => void;
 }) => {
   const [apiKey, setApiKey] = useState("");
-  const [txnId, setTxnId] = useState("");
-  if (apiKey && txnId) {
-    onConfirm(apiKey, txnId);
-  }
   if (!apiKey) {
     return <GetWiseApiKey onConfirm={setApiKey} />;
   }
-  return <GetTransactionId onConfirm={setTxnId} />;
+  return <GetTransactionId onConfirm={(txnId: string) => onConfirm(apiKey, txnId)} />;
 };
 
 const GetTransactionId = ({
