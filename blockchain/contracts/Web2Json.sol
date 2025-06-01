@@ -4,34 +4,41 @@ pragma solidity ^0.8.25;
 import {ContractRegistry} from "@flarenetwork/flare-periphery-contracts/coston2/ContractRegistry.sol";
 import {IWeb2Json} from "@flarenetwork/flare-periphery-contracts/coston2/IWeb2Json.sol";
 
-struct StarWarsCharacter {
-    string name;
-    uint256 numberOfMovies;
-    uint256 apiUid;
-    uint256 bmi;
+struct WiseTransfer {
+    uint256 id;
+    string status;
+    uint256 rate;
+    string sourceCurrency;
+    string targetCurrency;
+    uint256 sourceValue;
+    uint256 targetValue;
+    string created;
 }
 
 struct DataTransportObject {
-    string name;
-    uint256 height;
-    uint256 mass;
-    uint256 numberOfMovies;
-    uint256 apiUid;
+    uint256 id;
+    string status;
+    uint256 rate;
+    string sourceCurrency;
+    string targetCurrency;
+    uint256 sourceValue;
+    uint256 targetValue;
+    string created;
 }
 
-interface IStarWarsCharacterListV2 {
-    function addCharacter(IWeb2Json.Proof calldata data) external;
-    function getAllCharacters()
+interface IWiseTransferListV2 {
+    function addTransfer(IWeb2Json.Proof calldata data) external;
+    function getAllTransfers()
         external
         view
-        returns (StarWarsCharacter[] memory);
+        returns (WiseTransfer[] memory);
 }
 
-contract StarWarsCharacterListV2 {
-    mapping(uint256 => StarWarsCharacter) public characters;
-    uint256[] public characterIds;
+contract WiseTransferListV2 {
+    mapping(uint256 => WiseTransfer) public transfers;
+    uint256[] public transferIds;
 
-    function addCharacter(IWeb2Json.Proof calldata data) public {
+    function addTransfer(IWeb2Json.Proof calldata data) public {
         require(isJsonApiProofValid(data), "Invalid proof");
 
         DataTransportObject memory dto = abi.decode(
@@ -39,29 +46,33 @@ contract StarWarsCharacterListV2 {
             (DataTransportObject)
         );
 
-        require(characters[dto.apiUid].apiUid == 0, "Character already exists");
+        require(transfers[dto.id].id == 0, "Transfer already exists");
 
-        StarWarsCharacter memory character = StarWarsCharacter({
-            name: dto.name,
-            numberOfMovies: dto.numberOfMovies,
-            apiUid: dto.apiUid,
-            bmi: (dto.mass * 100 * 100) / (dto.height * dto.height)
+        WiseTransfer memory transfer = WiseTransfer({
+            id: dto.id,
+            status: dto.status,
+            rate: dto.rate,
+            sourceCurrency: dto.sourceCurrency,
+            targetCurrency: dto.targetCurrency,
+            sourceValue: dto.sourceValue,
+            targetValue: dto.targetValue,
+            created: dto.created
         });
 
-        characters[dto.apiUid] = character;
-        characterIds.push(dto.apiUid);
+        transfers[dto.id] = transfer;
+        transferIds.push(dto.id);
     }
 
-    function getAllCharacters()
+    function getAllTransfers()
         public
         view
-        returns (StarWarsCharacter[] memory)
+        returns (WiseTransfer[] memory)
     {
-        StarWarsCharacter[] memory result = new StarWarsCharacter[](
-            characterIds.length
+        WiseTransfer[] memory result = new WiseTransfer[](
+            transferIds.length
         );
-        for (uint256 i = 0; i < characterIds.length; i++) {
-            result[i] = characters[characterIds[i]];
+        for (uint256 i = 0; i < transferIds.length; i++) {
+            result[i] = transfers[transferIds[i]];
         }
         return result;
     }
