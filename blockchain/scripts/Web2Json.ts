@@ -1,8 +1,8 @@
 import { run, web3 } from "hardhat";
-import { StarWarsCharacterListV2Instance } from "../../typechain-types";
+import { WiseTransferListV2Instance } from "../../typechain-types";
 import { prepareAttestationRequestBase, submitAttestationRequest, retrieveDataAndProofBaseWithRetry } from "./Base";
 
-const StarWarsCharacterListV2 = artifacts.require("StarWarsCharacterListV2");
+const WiseTransferListV2 = artifacts.require("WiseTransferListV2");
 
 const { WEB2JSON_VERIFIER_URL_TESTNET, VERIFIER_API_KEY_TESTNET, COSTON2_DA_LAYER_URL } = process.env;
 
@@ -11,14 +11,14 @@ const { WEB2JSON_VERIFIER_URL_TESTNET, VERIFIER_API_KEY_TESTNET, COSTON2_DA_LAYE
 // Request data
 // const apiUrl = "https://swapi.dev/api/people/3/";
 // const postProcessJq = `{name: .name, height: .height, mass: .mass, numberOfFilms: .films | length, uid: (.url | split("/") | .[-2] | tonumber)}`;
-const apiUrl = "https://swapi.info/api/people/3";
-const postProcessJq = `{name: .name, height: .height, mass: .mass, numberOfFilms: .films | length, uid: (.url | split("/") | .[-1] | tonumber)}`;
+const apiUrl = "https://api.transferwise.com/v1/transfers/1563230340";
+const postProcessJq = `{id: .id, status: .status, rate: .rate, sourceCurrency: .sourceCurrency, targetCurrency: .targetCurrency, sourceValue: .sourceValue, targetValue: .targetValue, created: .created}`;
 const httpMethod = "GET";
 // Defaults to "Content-Type": "application/json"
-const headers = "{}";
+const headers = `{"Authorization": "Bearer ${process.env.WISE_KEY}"}`;
 const queryParams = "{}";
 const body = "{}";
-const abiSignature = `{"components": [{"internalType": "string", "name": "name", "type": "string"},{"internalType": "uint256", "name": "height", "type": "uint256"},{"internalType": "uint256", "name": "mass", "type": "uint256"},{"internalType": "uint256", "name": "numberOfFilms", "type": "uint256"},{"internalType": "uint256", "name": "uid", "type": "uint256"}],"name": "task","type": "tuple"}`;
+const abiSignature = `{"components": [{"internalType": "uint256", "name": "id", "type": "uint256"},{"internalType": "string", "name": "status", "type": "string"},{"internalType": "uint256", "name": "rate", "type": "uint256"},{"internalType": "string", "name": "sourceCurrency", "type": "string"},{"internalType": "string", "name": "targetCurrency", "type": "string"},{"internalType": "uint256", "name": "sourceValue", "type": "uint256"},{"internalType": "uint256", "name": "targetValue", "type": "uint256"},{"internalType": "string", "name": "created", "type": "string"}],"name": "transfer","type": "tuple"}`;
 
 // Configuration constants
 const attestationTypeBase = "Web2Json";
@@ -50,20 +50,20 @@ async function retrieveDataAndProof(abiEncodedRequest: string, roundId: number) 
 
 async function deployAndVerifyContract() {
     const args: any[] = [];
-    const characterList: StarWarsCharacterListV2Instance = await StarWarsCharacterListV2.new(...args);
+    const transferList: WiseTransferListV2Instance = await WiseTransferListV2.new(...args);
     try {
         await run("verify:verify", {
-            address: characterList.address,
+            address: transferList.address,
             constructorArguments: args,
         });
     } catch (e: any) {
         console.log(e);
     }
-    console.log("StarWarsCharacterListV2 deployed to", characterList.address, "\n");
-    return characterList;
+    console.log("WiseTransferListV2 deployed to", transferList.address, "\n");
+    return transferList;
 }
 
-async function interactWithContract(characterList: StarWarsCharacterListV2Instance, proof: any) {
+async function interactWithContract(transferList: WiseTransferListV2Instance, proof: any) {
     console.log("Proof hex:", proof.response_hex, "\n");
 
     // A piece of black magic that allows us to read the response type from an artifact
@@ -73,12 +73,12 @@ async function interactWithContract(characterList: StarWarsCharacterListV2Instan
 
     const decodedResponse = web3.eth.abi.decodeParameter(responseType, proof.response_hex);
     console.log("Decoded proof:", decodedResponse, "\n");
-    const transaction = await characterList.addCharacter({
+    const transaction = await transferList.addTransfer({
         merkleProof: proof.proof,
         data: decodedResponse,
     });
     console.log("Transaction:", transaction.tx, "\n");
-    console.log("Star Wars Characters:\n", await characterList.getAllCharacters(), "\n");
+    console.log("Wise Transfers:\n", await transferList.getAllTransfers(), "\n");
 }
 
 async function main() {
@@ -90,9 +90,9 @@ async function main() {
 
     const proof = await retrieveDataAndProof(abiEncodedRequest, roundId);
 
-    const characterList: StarWarsCharacterListV2Instance = await deployAndVerifyContract();
+    const transferList: WiseTransferListV2Instance = await deployAndVerifyContract();
 
-    await interactWithContract(characterList, proof);
+    await interactWithContract(transferList, proof);
 }
 
 void main().then(() => {
